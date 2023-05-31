@@ -23,7 +23,7 @@ on:
   workflow_dispatch:
 
 env:
-  AZURE_PUBLISH_PROFILE: 'secrets.AzureAppService_PublishProfile_1234'
+  AZURE_PUBLISH_PROFILE: 'secrets.AZUREAPPSERVICE_PUBLISHPROFILE_441B36245F134200B9C77A716EE5BDA7'
   AZURE_WEBAPP_NAME: 'npm-poc-run'    # Azure App Service: Web App Name
   AZURE_APP_SERVICE_SLOT: 'production'      # App Service deployment slot
   AZURE_WEBAPP_PACKAGE_PATH: '.'      # set this to the path to your web app project, defaults to the repository root
