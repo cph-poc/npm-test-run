@@ -4,6 +4,11 @@ var logger = require('morgan');
 var index = require('./routes/index');
 var app = express();
 
+let appInsights = require("applicationinsights");
+
+appInsights.setup("InstrumentationKey=a012f4a3-4330-43fc-8e74-31a7a37eb235;IngestionEndpoint=https://southeastasia-1.in.applicationinsights.azure.com/;LiveEndpoint=https://southeastasia.livediagnostics.monitor.azure.com/")
+.setAutoDependencyCorrelation(false)
+.start();
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
