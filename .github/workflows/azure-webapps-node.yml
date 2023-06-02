@@ -84,11 +84,13 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
           registry-url: https://npm.pkg.github.com/
           scope: '@arjhonlajom-crayon'
+      - run: npm install -g npm-cli-login
+      - run: npm npm-cli-login -u arjhon-lajom -p ${{ secrets.GH_CLASSIC_TOKEN }} -e arjhon.lajom@crayon.com -r https://npm.pkg.github.com/
       - run: npm ci
       - run: npm publish
         env:
-          NODE_AUTH_TOKEN : ${{ secrets.GH_TOKEN_PACKAGES }}
-          GITHUB_TOKEN: ${{ secrets.GH_TOKEN_PACKAGES }}
+          NODE_AUTH_TOKEN : ${{ secrets.GH_CLASSIC_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GH_CLASSIC_TOKEN }}
 
   deploy: # release
     permissions:
