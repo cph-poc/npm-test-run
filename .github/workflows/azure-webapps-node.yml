@@ -82,12 +82,12 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: ${{ env.NODE_VERSION }}
-          registry-url: https://npm.pkg.github.com/:_authToken=${{ secrets.NODE_TOKEN }}
-          user: "arjlajom"
+          registry-url: https://npm.pkg.github.com/
+          user: "arjhonlajom-crayon"
       - run: npm ci
       - run: npm publish
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.NODE_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GH_SECRET_TOKEN }}
 
   deploy: # release
     permissions:
