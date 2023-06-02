@@ -58,12 +58,14 @@ jobs:
         node-version: ${{ env.NODE_VERSION }}
         cache: 'npm'
 
-    - name: Replace values
+    - name: Create .npmrc file and drop credentials
       shell: bash
       env: 
-        PAT: ${{ secrets.GH_CLASSIC_TOKEN }}
+        PAT: ${{ secrets.GH_NPMRC_ARJHONLAJOM_CRAYON_WITH_EMBEDDED_PAT }}
       run: |
-        sed -i.back "s|MY_PAT_SECRET|${PAT}|g" .npmrc
+        echo $PAT
+        echo ${{ secrets.GH_NPMRC_ARJHONLAJOM_CRAYON_WITH_EMBEDDED_PAT }} > .npmrc
+      
 
     - name: npm install, build, and test
       run: |
