@@ -84,8 +84,6 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
           registry-url: https://npm.pkg.github.com/
       # npm config set _authToken ${{ secrets.NODE_TOKEN }}
-      - run: |
-          npm config set always-auth true
          
       - run: npm ci
       - run: npm publish
