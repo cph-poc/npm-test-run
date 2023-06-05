@@ -112,7 +112,6 @@ jobs:
       contents: read
     steps:
       - uses: actions/checkout@v3
-
       - name: replace values MY_PAT_SECRET with GH PAT
         uses: jacobtomlinson/gha-find-replace@v3
         with:
@@ -121,7 +120,6 @@ jobs:
           include: "**.npmrc"
           exclude: ".git/**"
 
-      
       - name: read .npmrc 
         id: readnpmrc
         uses: jaywcjlove/github-action-read-file@main
@@ -145,14 +143,16 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GH_CLASSIC_TOKEN }}
 
   deploy: # release
+    name: Deploy to Azure App Service
     permissions:
       contents: none
     runs-on: ubuntu-latest
     needs: 
       - build
-    environment:
-      name: 'production'
-      url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
+
+    # environment:
+    #   name: 'production'
+    #   url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
 
     steps:
     - name: Download artifact from build job
@@ -160,11 +160,52 @@ jobs:
       with:
         name: node-app
 
-    - name: 'Deploy to Azure WebApp'
-      id: deploy-to-webapp
+    - name: deploy to prod
+      if: github.ref == 'refs/heads/main'
+      id: deploy-to-webapp-prod
       uses: azure/webapps-deploy@v2
       with:
         app-name: ${{ env.AZURE_WEBAPP_NAME }}
         publish-profile: ${{ secrets.AZURE_PUBLISH_PROFILE }}
         package: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
-        slot-name:  ${{ env.AZURE_APP_SERVICE_SLOT }}
+        slot-name:  "production"
+
+    - name: deploy to dev
+      if: github.ref == 'refs/heads/dev'
+      id: deploy-to-webapp-dev
+      uses: azure/webapps-deploy@v2
+      with:
+        app-name: ${{ env.AZURE_WEBAPP_NAME }}
+        publish-profile: ${{ secrets.AZURE_PUBLISH_PROFILE }}
+        package: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
+        slot-name:  "dev"
+
+    - name: deploy to qa
+      if: github.ref == 'refs/heads/qa'
+      id: deploy-to-webapp-qa
+      uses: azure/webapps-deploy@v2
+      with:
+        app-name: ${{ env.AZURE_WEBAPP_NAME }}
+        publish-profile: ${{ secrets.AZURE_PUBLISH_PROFILE }}
+        package: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
+        slot-name:  "qa"
+
+    - name: deploy to staging
+      if: github.ref == 'refs/heads/staging'
+      id: deploy-to-webapp-staging
+      uses: azure/webapps-deploy@v2
+      with:
+        app-name: ${{ env.AZURE_WEBAPP_NAME }}
+        publish-profile: ${{ secrets.AZURE_PUBLISH_PROFILE }}
+        package: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
+        slot-name:  "staging"
+
+    - name: deploy to uat
+      if: github.ref == 'refs/heads/uat'
+      id: deploy-to-webapp-uat
+      uses: azure/webapps-deploy@v2
+      with:
+        app-name: ${{ env.AZURE_WEBAPP_NAME }}
+        publish-profile: ${{ secrets.AZURE_PUBLISH_PROFILE }}
+        package: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
+        slot-name:  "uat"
