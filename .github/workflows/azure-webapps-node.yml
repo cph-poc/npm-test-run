@@ -149,7 +149,7 @@ jobs:
       contents: none
     runs-on: ubuntu-latest
     needs: 
-      - publish-gpr
+      - build
     environment:
       name: 'production'
       url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
