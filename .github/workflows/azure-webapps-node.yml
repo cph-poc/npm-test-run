@@ -8,7 +8,6 @@ on:
 env:
   AZURE_PUBLISH_PROFILE: 'secrets.AZUREAPPSERVICE_PUBLISHPROFILE_441B36245F134200B9C77A716EE5BDA7'
   AZURE_WEBAPP_NAME: 'npm-poc-run'    # Azure App Service: Web App Name
-  AZURE_APP_SERVICE_SLOT:  '${{ vars.AZURE_APPSERVICE_DEPLOYMENTSLOT }}'      # App Service deployment slot
   AZURE_WEBAPP_PACKAGE_PATH: '.'      # set this to the path to your web app project, defaults to the repository root
   NODE_VERSION: '18.x'                # set this to the node version to use
 
