@@ -78,11 +78,14 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: replace values MY_PAT_SECRET with GH PAT
-      uses: MathieuSoysal/replace-string-in-file@v1.0.0
+      uses: jacobtomlinson/gha-find-replace@v3
       with:
-        file: .npmrc
-        old-string: MY_PAT_SECRET
-        new-string: ${{ secrets.GH_CLASSIC_TOKEN }}
+        find: "MY_PAT_SECRET"
+        replace: ${{ secrets.GH_CLASSIC_TOKEN }}
+        include: "**.npmrc"
+        # file: .npmrc
+        # old-string: MY_PAT_SECRET
+        # new-string: ${{ secrets.GH_CLASSIC_TOKEN }}
     
     - name: read .npmrc 
       id: readnpmrc
@@ -91,7 +94,9 @@ jobs:
         path: .npmrc
     
     - name: print .npmrc
-      run: echo "${{ steps.readnpmrc.outputs.content }}"
+      run: |
+        echo "==========================================="
+        echo "${{ steps.readnpmrc.outputs.content }}"
     
   
   publish-gpr: # package management - publish to npm
