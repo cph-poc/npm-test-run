@@ -89,6 +89,8 @@ jobs:
 
     - name: Replace credentials
       run: |
+        pwd
+        ls -a
         sed -i 's/MY_PAT_SECRET/${{ secrets.GH_CLASSIC_TOKEN }}/g' .npmrc
   
     
