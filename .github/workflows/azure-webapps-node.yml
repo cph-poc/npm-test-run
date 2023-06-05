@@ -76,41 +76,32 @@ jobs:
   do-sed:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
-    - name: replace values MY_PAT_SECRET with GH PAT
-      uses: jacobtomlinson/gha-find-replace@v3
-      with:
-        find: "MY_PAT_SECRET"
-        replace: ${{ secrets.GH_CLASSIC_TOKEN }}
-        include: "**.npmrc"
-        # file: .npmrc
-        # old-string: MY_PAT_SECRET
-        # new-string: ${{ secrets.GH_CLASSIC_TOKEN }}
+      - uses: actions/checkout@v2
+      - name: replace values MY_PAT_SECRET with GH PAT
+        uses: jacobtomlinson/gha-find-replace@v3
+        with:
+          find: "MY_PAT_SECRET"
+          replace: ${{ secrets.GH_CLASSIC_TOKEN }}
+          include: "**.npmrc"
+          exclude: ".git/**"
 
-    - name: Replace credentials
-      run: |
-        pwd
-        ls -a
-        sed -i 's/MY_PAT_SECRET/${{ secrets.GH_CLASSIC_TOKEN }}/g' .npmrc
-  
+      
+      - name: read .npmrc 
+        id: readnpmrc
+        uses: jaywcjlove/github-action-read-file@main
+        with:
+          path: .npmrc
+      
+      - name: print .npmrc
+        run: |
+          echo "==========================================="
+          echo "${{ steps.readnpmrc.outputs.content }}"
+      
     
-    
-    - name: read .npmrc 
-      id: readnpmrc
-      uses: jaywcjlove/github-action-read-file@main
-      with:
-        path: .npmrc
-    
-    - name: print .npmrc
-      run: |
-        echo "==========================================="
-        echo "${{ steps.readnpmrc.outputs.content }}"
-    
-  
   publish-gpr: # package management - publish to npm
-    needs: 
-      - build
-      - sonarcloud
+    # needs: 
+    #   - build
+    #   - sonarcloud
     runs-on: ubuntu-latest
     permissions:
       packages: write
