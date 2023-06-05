@@ -77,13 +77,22 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
-    - name: Replace values
+    - name: replace values MY_PAT_SECRET with GH PAT
       uses: MathieuSoysal/replace-string-in-file@v1.0.0
       with:
         file: .npmrc
         old-string: MY_PAT_SECRET
-        new-string: ${{ secrets.GH_CLASSIC_TOKEN }}\
-    - run: echo `cat .npmrc`
+        new-string: ${{ secrets.GH_CLASSIC_TOKEN }}
+    
+    - name: read .npmrc 
+      id: readnpmrc
+      uses: jaywcjlove/github-action-read-file@main
+      with:
+        path: .npmrc
+    
+    - name: print .npmrc
+      run: echo "${{ steps.readnpmrc.outputs.content }}"
+    
   
   publish-gpr: # package management - publish to npm
     needs: 
