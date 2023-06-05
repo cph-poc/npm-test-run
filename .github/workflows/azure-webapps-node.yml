@@ -86,6 +86,12 @@ jobs:
         # file: .npmrc
         # old-string: MY_PAT_SECRET
         # new-string: ${{ secrets.GH_CLASSIC_TOKEN }}
+
+    - name: Replace credentials
+      run: |
+        sed -i 's/MY_PAT_SECRET/${{ secrets.GH_CLASSIC_TOKEN }}/g' .npmrc
+  
+    
     
     - name: read .npmrc 
       id: readnpmrc
