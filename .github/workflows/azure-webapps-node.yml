@@ -82,10 +82,13 @@ jobs:
       with:
         file: .npmrc
         old-string: MY_PAT_SECRET
-        new-string: ${{ secrets.GH_CLASSIC_TOKEN }}
+        new-string: ${{ secrets.GH_CLASSIC_TOKEN }}\
+    - run: echo `cat .npmrc`
   
   publish-gpr: # package management - publish to npm
-    needs: build
+    needs: 
+      - build
+      - sonarcloud
     runs-on: ubuntu-latest
     permissions:
       packages: write
@@ -97,7 +100,6 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
           registry-url: https://npm.pkg.github.com/
           scope: '@cph-poc'
-      - run: echo `cat .npmrc`
       - run: npm ci
       - run: npm publish
         env:
