@@ -72,11 +72,19 @@ jobs:
       with:
         name: node-app
         path: .
-  
-  do-sed:
+      
+    
+  publish-gpr: # package management - publish to npm
+    # needs:
+    #   - build
+    #   - sonarcloud
     runs-on: ubuntu-latest
+    permissions:
+      packages: write
+      contents: read
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
+
       - name: replace values MY_PAT_SECRET with GH PAT
         uses: jacobtomlinson/gha-find-replace@v3
         with:
@@ -97,17 +105,6 @@ jobs:
           echo "==========================================="
           echo "${{ steps.readnpmrc.outputs.content }}"
       
-    
-  publish-gpr: # package management - publish to npm
-    # needs: 
-    #   - build
-    #   - sonarcloud
-    runs-on: ubuntu-latest
-    permissions:
-      packages: write
-      contents: read
-    steps:
-      - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
           node-version: ${{ env.NODE_VERSION }}
