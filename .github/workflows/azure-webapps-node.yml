@@ -31,8 +31,9 @@ jobs:
     needs: setup-stage
     runs-on: ubuntu-latest
     steps:
-      - run: | 
-        echo "Environment: ${{ needs.setup-stage.outputs.env-name }}"
+      - name: npm install, build, and test
+        run: |
+          echo Environment: ${{ needs.setup-stage.outputs.env-name }}
 
 
   sonarcloud: #security integration
