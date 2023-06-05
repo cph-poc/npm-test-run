@@ -35,7 +35,6 @@ permissions:
 jobs:
   sonarcloud: #security integration
     name: SonarCloud
-    if: github.repository == 'octo-org/octo-repo-prod'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -49,8 +48,6 @@ jobs:
           
   build:
     runs-on: ubuntu-latest
-    name: build npm
-    if: github.repository == 'octo-org/octo-repo-prod'
     needs: 
       - sonarcloud
     steps:
@@ -75,9 +72,9 @@ jobs:
       
     
   publish-gpr: # package management - publish to npm
-    # needs:
-    #   - build
-    #   - sonarcloud
+    needs:
+      - build
+      - sonarcloud
     runs-on: ubuntu-latest
     permissions:
       packages: write
@@ -120,9 +117,7 @@ jobs:
     permissions:
       contents: none
     runs-on: ubuntu-latest
-    if: github.repository == 'octo-org/octo-repo-prod'
     needs: 
-      - build
       - publish-gpr
     environment:
       name: 'production'
