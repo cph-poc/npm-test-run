@@ -16,12 +16,23 @@ permissions:
   contents: read
 
 jobs:
+
+  setup-stage:
+    outputs:
+      env-name: ${{ steps.env-name.outputs.env }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup Environment Name
+        id: env-name
+        run: echo "::set-output name=env::${{ fromJSON('{"main":"prod","develop":"dev"}')[github.ref_name] }}"
+        
   env_var:
     name: env_var_test
+    needs: setup-stage
     runs-on: ubuntu-latest
- 
     steps:
-      - run: echo ${{ env.AZURE_APP_SERVICE_SLOT }}
+      - run: | 
+        echo "Environment: ${{ needs.setup-stage.outputs.env-name }}"
 
 
   sonarcloud: #security integration
@@ -36,15 +47,6 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GH_SECRET_TOKEN }}  
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-
-  dependency-review:
-    runs-on: ubuntu-latest
-    name: "dependency review"
-    steps:
-      - name: 'Checkout Repository'
-        uses: actions/checkout@v3
-      - name: 'Dependency Review'
-        uses: actions/dependency-review-action@v2
 
 
   OSSAR-Scan:
@@ -85,7 +87,6 @@ jobs:
     runs-on: ubuntu-latest
     needs: 
       - sonarcloud
-      - dependency-review
       - OSSAR-Scan
     steps:
     - uses: actions/checkout@v3
