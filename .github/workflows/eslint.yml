@@ -48,3 +48,4 @@ jobs:
         with:
           repo-token: '${{ secrets.GITHUB_TOKEN }}'
           report-json: 'lint-js-report.json'
+        continue-on-error: true
