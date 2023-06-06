@@ -12,7 +12,6 @@
     #############################
     on:
       push:
-        branches: [ "dev","qa","staging", "uat"]
         branches-ignore: [master, main]
         # Remove the line above to run when pushing to master
       pull_request:
