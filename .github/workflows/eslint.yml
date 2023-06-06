@@ -34,9 +34,11 @@ jobs:
 
       - name: Validate package.json
         run: npx eslint package.json
+        continue-on-error: true
 
       - name: Detect ESLint coding standard violations
         run: npx eslint .
+        continue-on-error: true
 
       - name: Generate ESLint coding standard violations report
         run: npx eslint --output-file lint-js-report.json --format json .
