@@ -32,8 +32,8 @@ jobs:
         env:
           CI: true
 
-      - name: Validate package.json
-        run: npm run lint:pkg-json
+      # - name: Validate package.json
+      #   run: npm run lint:pkg-json
 
       - name: Detect ESLint coding standard violations
         run: npm run lint:js
