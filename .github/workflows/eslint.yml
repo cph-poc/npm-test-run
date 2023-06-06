@@ -28,7 +28,9 @@ jobs:
           node-version: 18
           cache: 'npm'
       - name: Install Node Dependencies
-        run: npm ci
+        run: |
+          npm install
+          npm ci
         env:
           CI: TRUE
       - name: Test Code Linting
@@ -37,15 +39,17 @@ jobs:
         # npm script for ESLint
         # See https://eslint.org/docs/user-guide/command-line-interface#options
         run: |
-          eslint --output-file eslint_report.json --format json src
+          npx eslint --output-file eslint_report.json --format json src
           npm run lint:report
         # Continue to the next step even if this fails
         continue-on-error: true
+
       - name: Annotate Code Linting Results
         uses: ataylorme/eslint-annotate-action@v2
         with:
           repo-token: "${{ secrets.GH_CLASSIC_TOKEN }}"
           report-json: "eslint_report.json"
+          
       # OPTIONAL: save a copy of the usage report for download or use in another job
       - name: Upload ESLint report
         uses: actions/upload-artifact@v3
