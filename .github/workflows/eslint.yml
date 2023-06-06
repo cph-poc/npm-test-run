@@ -35,8 +35,8 @@ jobs:
       # - name: Validate package.json
       #   run: npm run lint:pkg-json
 
-      - name: Detect ESLint coding standard violations
-        run: npm run lint:js
+      # - name: Detect ESLint coding standard violations
+      #   run: npm run lint:js
 
       - name: Generate ESLint coding standard violations report
         run: npm run lint:js:report
