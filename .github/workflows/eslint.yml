@@ -17,33 +17,39 @@ on:
     branches: [ "main", "dev","qa","staging", "uat" ]
 
 jobs:
-  eslint:
-    name: Run eslint scanning
+  node_test:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      security-events: write
-      actions: read # only required for a private repository by github/codeql-action/upload-sarif to get the Action run status
+
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Install ESLint
-        run: |
-          npm install eslint@8.10.0
-          npm init @eslint/config -- --config semistandard
-          npm install @microsoft/eslint-formatter-sarif@2.1.7
-
-      - name: Run ESLint
-        run: npx eslint .
-          --config .eslintrc.js
-          --ext .js,.jsx,.ts,.tsx
-          --format @microsoft/eslint-formatter-sarif
-          --output-file eslint-results.sarif
-        continue-on-error: true
-
-      - name: Upload analysis results to GitHub
-        uses: github/codeql-action/upload-sarif@v2
+      - uses: actions/checkout@v3
+      - name: Setup Node
+        uses: actions/setup-node@v3
         with:
-          sarif_file: eslint-results.sarif
-          wait-for-processing: true
+          node-version: 18
+          cache: 'npm'
+      - name: Install Node Dependencies
+        run: npm ci
+        env:
+          CI: TRUE
+      - name: Test Code Linting
+        run: npm run lint
+      - name: Save Code Linting Report JSON
+        # npm script for ESLint
+        # See https://eslint.org/docs/user-guide/command-line-interface#options
+        run: |
+          eslint --output-file eslint_report.json --format json src
+          npm run lint:report
+        # Continue to the next step even if this fails
+        continue-on-error: true
+      - name: Annotate Code Linting Results
+        uses: ataylorme/eslint-annotate-action@v2
+        with:
+          repo-token: "${{ secrets.GH_CLASSIC_TOKEN }}"
+          report-json: "eslint_report.json"
+      # OPTIONAL: save a copy of the usage report for download or use in another job
+      - name: Upload ESLint report
+        uses: actions/upload-artifact@v3
+        with:
+          name: eslint_report.json
+          path: eslint_report.json
+          retention-days: 5

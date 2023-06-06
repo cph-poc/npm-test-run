@@ -160,7 +160,7 @@ jobs:
         name: node-app
 
     - name: deploy to prod
-      if: github.ref == 'refs/heads/main'
+      if: github.ref == 'refs/heads/main' ||  github.ref == 'refs/heads/prod'
       id: deploy-to-webapp-prod
       uses: azure/webapps-deploy@v2
       with:
