@@ -58,6 +58,5 @@
               VALIDATE_JSX: true
               VALIDATE_JSON: true
               JAVASCRIPT_DEFAULT_STYLE: prettier
-              JAVASCRIPT_ES_CONFIG_FILE: .eslintrc.js
               DEFAULT_BRANCH: master
               GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
