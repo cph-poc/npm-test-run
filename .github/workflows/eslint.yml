@@ -45,9 +45,9 @@ jobs:
         continue-on-error: true
 
       - name: Annotate Code Linting Results
-        uses: ataylorme/eslint-annotate-action@v2.1.1
+        uses: ataylorme/eslint-annotate-action@v2
         with:
-          repo-token: "${{ secrets.GITHUB_TOKEN }}"
+          repo-token: "${{ secrets.GH_CLASSIC_TOKEN }}"
           report-json: "eslint_report.json"
           
       # OPTIONAL: save a copy of the usage report for download or use in another job
