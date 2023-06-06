@@ -3,7 +3,7 @@
   "version": "0.0.3",
   "private": false,
   "scripts": {
-    "lint:js": "lint-js eslint",
+    "lint:js": "lint-js",
     "lint:pkg-json": "lint-pkg-json --ignorePath .gitignore",
     "lint:js:report": "npm run lint:js -- --output-file lint-js-report.json --format json .",
     "start": "node ./bin/www"
