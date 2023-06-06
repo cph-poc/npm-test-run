@@ -33,13 +33,13 @@ jobs:
           CI: true
 
       - name: Validate package.json
-        run: ./node_modules/.bin/eslint package.json
+        run: npx eslint package.json
 
       - name: Detect ESLint coding standard violations
-        run: ./node_modules/.bin/eslint .
+        run: npx eslint .
 
       - name: Generate ESLint coding standard violations report
-        run: ./node_modules/.bin/eslint --output-file lint-js-report.json --format json .
+        run: npx eslint --output-file lint-js-report.json --format json .
         continue-on-error: true
 
       - name: Annotate code linting results
