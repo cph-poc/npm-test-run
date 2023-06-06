@@ -1,6 +1,5 @@
 var express = require('express');
 var path = require('path');
-var logger = require('morgan');
 var index = require('./routes/index');
 var app = express();
 
@@ -32,6 +31,7 @@ app.use(function(req, res, next) {
 app.use(function(err, req, res, next) {
   // render the error page
   res.status(err.status || 500);
+  next(err);
   res.render('error', {status:err.status, message:err.message});
 });
 

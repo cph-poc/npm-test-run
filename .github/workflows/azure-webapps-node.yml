@@ -1,31 +1,13 @@
-# This workflow will build and push a node.js application to an Azure Web App when a commit is pushed to your default branch.
-#
-# This workflow assumes you have already created the target Azure App Service web app.
-# For instructions see https://docs.microsoft.com/en-us/azure/app-service/quickstart-nodejs?tabs=linux&pivots=development-environment-cli
-#
-# To configure this workflow:
-#
-# 1. Download the Publish Profile for your Azure Web App. You can download this file from the Overview page of your Web App in the Azure Portal.
-#    For more information: https://docs.microsoft.com/en-us/azure/app-service/deploy-github-actions?tabs=applevel#generate-deployment-credentials
-#
-# 2. Create a secret in your repository named AZURE_WEBAPP_PUBLISH_PROFILE, paste the publish profile contents as the value of the secret.
-#    For instructions on obtaining the publish profile see: https://docs.microsoft.com/azure/app-service/deploy-github-actions#configure-the-github-secret
-#
-# 3. Change the value for the AZURE_WEBAPP_NAME. Optionally, change the AZURE_WEBAPP_PACKAGE_PATH and NODE_VERSION environment variables below.
-#
-# For more information on GitHub Actions for Azure: https://github.com/Azure/Actions
-# For more information on the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
-# For more samples to get started with GitHub Action workflows to deploy to Azure: https://github.com/Azure/actions-workflow-samples
+
 name: "NPM Build to Deploy"
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "main", "dev","qa","staging", "uat" ]
   workflow_dispatch:
 
 env:
   AZURE_PUBLISH_PROFILE: 'secrets.AZUREAPPSERVICE_PUBLISHPROFILE_441B36245F134200B9C77A716EE5BDA7'
   AZURE_WEBAPP_NAME: 'npm-poc-run'    # Azure App Service: Web App Name
-  AZURE_APP_SERVICE_SLOT: 'production'      # App Service deployment slot
   AZURE_WEBAPP_PACKAGE_PATH: '.'      # set this to the path to your web app project, defaults to the repository root
   NODE_VERSION: '18.x'                # set this to the node version to use
 
@@ -33,6 +15,26 @@ permissions:
   contents: read
 
 jobs:
+
+  setup-stage:
+    outputs:
+      env-name: ${{ steps.env-name.outputs.env }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup Environment Name
+        id: env-name
+        run: echo "::set-output name=env::${{ fromJSON('{"main":"prod","develop":"dev"}')[github.ref_name] }}"
+        
+  env_var:
+    name: env_var_test
+    needs: setup-stage
+    runs-on: ubuntu-latest
+    steps:
+      - name: npm install, build, and test
+        run: |
+          echo Environment: ${{ needs.setup-stage.outputs.env-name }}
+
+
   sonarcloud: #security integration
     name: SonarCloud
     runs-on: ubuntu-latest
@@ -45,11 +47,38 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GH_SECRET_TOKEN }}  
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+
+  OSSAR-Scan:
+    # OSSAR runs on windows-latest.
+    # ubuntu-latest and macos-latest support coming soon
+    permissions:
+      contents: read # for actions/checkout to fetch code
+      security-events: write # for github/codeql-action/upload-sarif to upload SARIF results
+      actions: read # only required for a private repository by github/codeql-action/upload-sarif to get the Action run status
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+      # Run open source static analysis tools
+    - name: Run OSSAR
+      uses: github/ossar-action@v1
+      id: ossar
+
+      # Upload results to the Security tab
+    - name: Upload OSSAR results
+      uses: github/codeql-action/upload-sarif@v2
+      with:
+        sarif_file: ${{ steps.ossar.outputs.sarifFile }}
           
   build:
     runs-on: ubuntu-latest
     needs: 
       - sonarcloud
+      - OSSAR-Scan
+      - env_var
     steps:
     - uses: actions/checkout@v3
     - name: Set up Node.js
@@ -75,13 +104,13 @@ jobs:
     needs:
       - build
       - sonarcloud
+    if: github.ref == 'refs/heads/staging' || github.ref == 'refs/heads/staging'
     runs-on: ubuntu-latest
     permissions:
       packages: write
       contents: read
     steps:
       - uses: actions/checkout@v3
-
       - name: replace values MY_PAT_SECRET with GH PAT
         uses: jacobtomlinson/gha-find-replace@v3
         with:
@@ -90,7 +119,6 @@ jobs:
           include: "**.npmrc"
           exclude: ".git/**"
 
-      
       - name: read .npmrc 
         id: readnpmrc
         uses: jaywcjlove/github-action-read-file@main
@@ -114,14 +142,16 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GH_CLASSIC_TOKEN }}
 
   deploy: # release
+    name: Deploy to Azure App Service
     permissions:
       contents: none
     runs-on: ubuntu-latest
     needs: 
-      - publish-gpr
-    environment:
-      name: 'production'
-      url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
+      - build
+
+    # environment:
+    #   name: 'production'
+    #   url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
 
     steps:
     - name: Download artifact from build job
@@ -129,11 +159,52 @@ jobs:
       with:
         name: node-app
 
-    - name: 'Deploy to Azure WebApp'
-      id: deploy-to-webapp
+    - name: deploy to prod
+      if: github.ref == 'refs/heads/main' ||  github.ref == 'refs/heads/prod'
+      id: deploy-to-webapp-prod
       uses: azure/webapps-deploy@v2
       with:
         app-name: ${{ env.AZURE_WEBAPP_NAME }}
         publish-profile: ${{ secrets.AZURE_PUBLISH_PROFILE }}
         package: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
-        slot-name:  ${{ env.AZURE_APP_SERVICE_SLOT }}
+        slot-name:  "production"
+
+    - name: deploy to dev
+      if: github.ref == 'refs/heads/dev'
+      id: deploy-to-webapp-dev
+      uses: azure/webapps-deploy@v2
+      with:
+        app-name: ${{ env.AZURE_WEBAPP_NAME }}
+        publish-profile: ${{ secrets.AZURE_PUBLISH_PROFILE_DEV }}
+        package: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
+        slot-name:  "dev"
+
+    - name: deploy to qa
+      if: github.ref == 'refs/heads/qa'
+      id: deploy-to-webapp-qa
+      uses: azure/webapps-deploy@v2
+      with:
+        app-name: ${{ env.AZURE_WEBAPP_NAME }}
+        publish-profile: ${{ secrets.AZURE_PUBLISH_PROFILE_QA }}
+        package: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
+        slot-name:  "qa"
+
+    - name: deploy to staging
+      if: github.ref == 'refs/heads/staging'
+      id: deploy-to-webapp-staging
+      uses: azure/webapps-deploy@v2
+      with:
+        app-name: ${{ env.AZURE_WEBAPP_NAME }}
+        publish-profile: ${{ secrets.AZURE_PUBLISH_PROFILE_STAGING }}
+        package: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
+        slot-name:  "staging"
+
+    - name: deploy to uat
+      if: github.ref == 'refs/heads/uat'
+      id: deploy-to-webapp-uat
+      uses: azure/webapps-deploy@v2
+      with:
+        app-name: ${{ env.AZURE_WEBAPP_NAME }}
+        publish-profile: ${{ secrets.AZURE_PUBLISH_PROFILE_UAT }}
+        package: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
+        slot-name:  "uat"
