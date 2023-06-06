@@ -1,5 +1,4 @@
 # https://github.com/GoogleChromeLabs/pwa-wp/blob/develop/
-# https://github.com/GoogleChromeLabs/pwa-wp/tree/develop/.github
 
 name: ESLint Scan
 
@@ -38,12 +37,10 @@ jobs:
         run: npm run lint:js
 
       - name: Generate ESLint coding standard violations report
-        # Prevent generating the ESLint report if PR is from a fork or authored by Dependabot.
         run: npm run lint:js:report
         continue-on-error: true
 
       - name: Annotate code linting results
-        # The action cannot annotate the PR when run from a PR fork or was authored by Dependabot.
         uses: ataylorme/eslint-annotate-action@v2
         with:
           repo-token: '${{ secrets.GITHUB_TOKEN }}'
