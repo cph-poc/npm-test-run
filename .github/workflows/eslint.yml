@@ -26,7 +26,10 @@ jobs:
           cache: npm
 
       - name: Install Node dependencies
-        run: npm ci
+        run:
+          npm cache clear --force 
+          npm install
+          npm ci
         env:
           CI: true
 
