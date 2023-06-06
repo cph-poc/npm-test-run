@@ -16,6 +16,9 @@ on:
     # The branches below must be a subset of the branches above
     branches: [ "main", "dev","qa","staging", "uat" ]
 
+permissions:
+  actions: write
+  
 jobs:
   node_test:
     runs-on: ubuntu-latest
