@@ -41,11 +41,9 @@
   },
   "homepage": "https://github.com/cph-poc/npm-test-run#readme",
   "devDependencies": {
-    "eslint": "^8.42.0",
-    "eslint-config-semistandard": "^17.0.0",
-    "eslint-config-standard": "^17.1.0",
-    "eslint-plugin-import": "^2.27.5",
-    "eslint-plugin-n": "^15.7.0",
-    "eslint-plugin-promise": "^6.1.1"
+    "eslint": "8.38.0",
+    "eslint-plugin-eslint-comments": "3.2.0",
+    "eslint-plugin-import": "2.27.5",
+    "eslint-plugin-jsdoc": "43.0.5"
   }
 }
