@@ -9,8 +9,7 @@ on:
     # The branches below must be a subset of the branches above
     branches: [ "main", "dev","qa","staging", "uat" ]
 
-permissions:
-  actions: write
+permissions: write-all
 
 jobs:
   lint_js:
