@@ -1,0 +1,46 @@
+# https://github.com/GoogleChromeLabs/pwa-wp/blob/develop/
+
+name: ESLint Scan
+
+on:
+  push:
+    branches: [ "main", "dev","qa","staging", "uat" ]
+  pull_request:
+    # The branches below must be a subset of the branches above
+    branches: [ "main", "dev","qa","staging", "uat" ]
+
+permissions: write-all
+
+jobs:
+  lint_js:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Setup Node
+        uses: actions/setup-node@v3.0.0
+        with:
+          node-version-file: '.nvmrc'
+          cache: npm
+
+      - name: Install Node dependencies
+        run:
+          npm install
+          npm ci
+        env:
+          CI: true
+
+      - name: Detect ESLint coding standard violations
+        run: npx eslint .
+        continue-on-error: true
+
+      - name: Generate ESLint coding standard violations report
+        run: npx eslint --output-file lint-js-report.json --format json .
+        continue-on-error: true
+
+      - name: Annotate code linting results
+        uses: ataylorme/eslint-annotate-action@v2
+        with:
+          repo-token: '${{ secrets.GITHUB_TOKEN }}'
+          report-json: 'lint-js-report.json'
