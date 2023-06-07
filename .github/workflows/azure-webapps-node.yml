@@ -47,6 +47,9 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GH_SECRET_TOKEN }}  
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        with:
+          args: >
+            -Dsonar.verbose=true
 
 
   OSSAR-Scan:
@@ -104,7 +107,7 @@ jobs:
     needs:
       - build
       - sonarcloud
-    if: github.ref == 'refs/heads/staging' || github.ref == 'refs/heads/staging'
+    if: github.ref == 'refs/heads/staging' || github.ref == 'refs/heads/uat' || github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     permissions:
       packages: write
