@@ -36,3 +36,15 @@ jobs:
           push: true
           build-args: version=${{ steps.tag.outputs.tag }}
           tags: "${{ secrets.AZURE_ACR_ENDPOINT }}/${{ env.IMAGE_NAME }}:${{ steps.tag.outputs.tag }}"
+
+      - name: 'Deploy to Azure Container Instances'
+        uses: 'azure/aci-deploy@v1'
+        with:
+          resource-group: test_group
+          dns-name-label: node-app.eastus.azurecontainer.io
+          image: "${{ secrets.AZURE_ACR_ENDPOINT }}/${{ env.IMAGE_NAME }}:${{ steps.tag.outputs.tag }}"
+          registry-login-server: ${{ secrets.AZURE_ACR_ENDPOINT  }}
+          registry-username: ${{ secrets.AZURE_ACR_USERNAME }}
+          registry-password: ${{ secrets.AZURE_ACR_PASSWORD }}
+          name: aci-sampleapp
+          location: 'west us'
