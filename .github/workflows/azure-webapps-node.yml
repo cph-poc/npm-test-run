@@ -107,7 +107,7 @@ jobs:
     needs:
       - build
       - sonarcloud
-    if: github.ref == 'refs/heads/staging' || github.ref == 'refs/heads/uat' || github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/staging' || github.ref == 'refs/heads/uat' || github.ref == 'refs/heads/main' || github.ref == 'refs/heads/dev'
     runs-on: ubuntu-latest
     permissions:
       packages: write
@@ -138,6 +138,7 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
           registry-url: https://npm.pkg.github.com/
           scope: '@cph-poc'
+      - run: npm install
       - run: npm ci
       - run: npm publish
         env:
