@@ -46,5 +46,5 @@ jobs:
           registry-login-server: ${{ secrets.AZURE_ACR_ENDPOINT  }}
           registry-username: ${{ secrets.AZURE_ACR_USERNAME }}
           registry-password: ${{ secrets.AZURE_ACR_PASSWORD }}
-          name: aci-sampleapp
+          name: poc-node-app
           location: 'west us'
