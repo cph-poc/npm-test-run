@@ -3,8 +3,6 @@ name: Docker
 on:
     push:
       tags: ['v*.*.*']
-    pull_request:
-      branches: [ "qa", "staging", "uat", "main" ]
 env:
   IMAGE_NAME: dockerize-node-app
 
