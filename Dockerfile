@@ -18,5 +18,5 @@ RUN npm install
 # docker run -p 8080:3000 -d node-web-app:latest
 COPY . .
 
-EXPOSE 3000
+EXPOSE 80
 CMD [ "npm", "start" ]
