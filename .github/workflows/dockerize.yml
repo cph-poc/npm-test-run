@@ -47,7 +47,7 @@ jobs:
         uses: 'azure/aci-deploy@v1'
         with:
           resource-group: test_group
-          dns-name-label: node-app.eastus.azurecontainer.io
+          dns-name-label: node-app-cphpoc.eastus.azurecontainer.io
           image: "${{ secrets.AZURE_ACR_ENDPOINT }}/${{ env.IMAGE_NAME }}:${{ steps.tag.outputs.tag }}"
           registry-login-server: ${{ secrets.AZURE_ACR_ENDPOINT  }}
           registry-username: ${{ secrets.AZURE_ACR_USERNAME }}
